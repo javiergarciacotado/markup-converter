@@ -1,0 +1,35 @@
+name: Generate ADR documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      document-name:
+        description: "Document name"
+        default: "a-document"
+      document-version:
+        description: "Document version"
+        default: "with-a-version"
+
+jobs:
+  generate-document:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: filter files
+        id: filter-files
+        run: |
+          filesWithoutReadme=$(ls *.md | grep -v README.md)
+          echo files= $(printf '"%s" ' $filesWithoutReadme)
+
+      - uses: docker://pandoc/latex:2.9
+        with:
+          args: --output=${{ inputs.document-name }}-${{ inputs.document-version}}.pdf ${{ steps.filter-files.outputs.files }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: formatted-document
+          path: formatted.md
