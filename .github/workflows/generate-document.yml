@@ -23,7 +23,7 @@ jobs:
         id: filter-files
         run: |
           filesWithoutReadme=$(ls *.md | grep -v README.md)
-          echo files= $(printf '"%s" ' $filesWithoutReadme)
+          echo files= $(printf '"%s" ' $filesWithoutReadme) > $GITHUB_OUTPUT
 
       - uses: docker://pandoc/latex:2.9
         with:
