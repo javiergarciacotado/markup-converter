@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
     inputs:
       document-name:
@@ -22,13 +23,14 @@ jobs:
       - name: filter files
         id: filter-files
         run: |
-          echo "files=$(ls *.md | grep -v README.md)" > $GITHUB_OUTPUT
+          filesWithoutReadme=$(ls *.md | grep -v README.md)
+          echo "files=$(printf '"%s" ' $filesWithoutReadme)" > $GITHUB_OUTPUT
 
       - uses: docker://pandoc/latex:2.9
         with:
-          args: --output=${{ inputs.document-name }}-${{ inputs.document-version}}.pdf ${{ steps.filter-files.outputs.files }}
+          args: --output=${{ inputs.document-name }}-${{ inputs.document-version}}.docx ${{ steps.filter-files.outputs.files }}
 
       - uses: actions/upload-artifact@v3
         with:
           name: formatted-document
-          path: ${{ inputs.document-name }}-${{ inputs.document-version}}.pdf
+          path: ${{ inputs.document-name }}-${{ inputs.document-version}}.docx
