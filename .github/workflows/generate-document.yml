@@ -22,7 +22,8 @@ jobs:
       - name: filter files
         id: filter-files
         run: |
-          echo "files=$(printf '"%s" ' *.md)" > $GITHUB_OUTPUT
+          filesWithoutReadme=$(ls *.md | grep -v README.md)
+          echo "files=$(printf '"%s" ' $filesWithoutReadme)" > $GITHUB_OUTPUT
 
       - uses: docker://pandoc/latex:2.9
         with:
@@ -31,4 +32,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: formatted-document
-          path: formatted.md
+          path: ${{ inputs.document-name }}-${{ inputs.document-version}}.pdf
